@@ -1,0 +1,47 @@
+# Application Configuration
+spring:
+  application:
+    name: openstock-backend
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/openstock
+      database: openstock
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${NODEMAILER_EMAIL:}
+    password: ${NODEMAILER_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 8080
+
+# Security Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:your-secret-key-here-change-in-production}
+    expiration: ${JWT_EXPIRATION:86400000}
+  finnhub:
+    api-key: ${FINNHUB_API_KEY:}
+    base-url: https://finnhub.io/api/v1
+
+# Logging Configuration
+logging:
+  level:
+    com.opendevsociety.openstock: DEBUG
+    org.springframework.security: DEBUG
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
