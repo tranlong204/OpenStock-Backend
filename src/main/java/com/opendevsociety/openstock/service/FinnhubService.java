@@ -240,8 +240,60 @@ public class FinnhubService {
     }
     
     private List<StockDto> parseSearchResults(Object data) {
-        // This would need to be implemented based on the actual Finnhub response structure
-        return new ArrayList<>();
+        List<StockDto> stocks = new ArrayList<>();
+        
+        try {
+            // Convert Object to Map for easier parsing
+            Map<String, Object> responseMap = (Map<String, Object>) data;
+            
+            // Extract the result array from Finnhub response
+            Object resultObj = responseMap.get("result");
+            
+            if (resultObj instanceof List) {
+                List<Object> resultList = (List<Object>) resultObj;
+                
+                for (Object item : resultList) {
+                    if (item instanceof Map) {
+                        Map<String, Object> itemMap = (Map<String, Object>) item;
+                        
+                        // Extract values from Finnhub search response
+                        String symbol = getStringValue(itemMap, "symbol");
+                        String description = getStringValue(itemMap, "description");
+                        String displaySymbol = getStringValue(itemMap, "displaySymbol");
+                        String type = getStringValue(itemMap, "type");
+                        
+                        // Use displaySymbol if available, otherwise use symbol
+                        String finalSymbol = displaySymbol != null ? displaySymbol : symbol;
+                        
+                        // Use description as company name
+                        String companyName = description != null ? description : finalSymbol;
+                        
+                        // Determine country based on symbol suffix
+                        String country = "US"; // Default to US
+                        if (finalSymbol != null) {
+                            if (finalSymbol.endsWith(".TO")) country = "CA";
+                            else if (finalSymbol.endsWith(".L")) country = "GB";
+                            else if (finalSymbol.endsWith(".AS")) country = "NL";
+                            else if (finalSymbol.endsWith(".MX")) country = "MX";
+                            else if (finalSymbol.endsWith(".RO")) country = "RO";
+                            else if (finalSymbol.endsWith(".SN")) country = "SN";
+                            else if (finalSymbol.endsWith(".VI")) country = "VI";
+                            else if (finalSymbol.endsWith(".WA")) country = "WA";
+                        }
+                        
+                        if (finalSymbol != null && companyName != null) {
+                            StockDto stock = new StockDto(finalSymbol, companyName, country, type != null ? type : "Stock");
+                            stocks.add(stock);
+                        }
+                    }
+                }
+            }
+            
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+        
+        return stocks;
     }
     
     private NewsArticleDto parseNewsArticle(Object article, boolean isCompanyNews, String symbol) {
