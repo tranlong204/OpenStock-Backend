@@ -1,5 +1,6 @@
 package com.opendevsociety.openstock.controller;
 
+import com.opendevsociety.openstock.dto.AddToWatchlistRequest;
 import com.opendevsociety.openstock.dto.WatchlistItemDto;
 import com.opendevsociety.openstock.service.WatchlistService;
 import com.opendevsociety.openstock.util.JwtUtil;
@@ -32,11 +33,10 @@ public class WatchlistController {
     @PostMapping
     public ResponseEntity<WatchlistItemDto> addToWatchlist(
             @RequestHeader("Authorization") String authHeader,
-            @RequestParam String symbol,
-            @RequestParam String company) {
+            @RequestBody AddToWatchlistRequest request) {
         
         String userId = getUserIdFromToken(authHeader);
-        WatchlistItemDto item = watchlistService.addToWatchlist(userId, symbol, company);
+        WatchlistItemDto item = watchlistService.addToWatchlist(userId, request.getSymbol(), request.getCompany());
         return ResponseEntity.ok(item);
     }
     
