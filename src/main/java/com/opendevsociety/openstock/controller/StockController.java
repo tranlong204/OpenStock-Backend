@@ -2,6 +2,7 @@ package com.opendevsociety.openstock.controller;
 
 import com.opendevsociety.openstock.dto.StockDto;
 import com.opendevsociety.openstock.dto.StockPriceDto;
+import com.opendevsociety.openstock.service.AuthService;
 import com.opendevsociety.openstock.service.FinnhubService;
 import com.opendevsociety.openstock.service.WatchlistService;
 import com.opendevsociety.openstock.util.JwtUtil;
@@ -23,6 +24,9 @@ public class StockController {
     private WatchlistService watchlistService;
     
     @Autowired
+    private AuthService authService;
+    
+    @Autowired
     private JwtUtil jwtUtil;
     
     @GetMapping("/search")
@@ -38,9 +42,10 @@ public class StockController {
                 String token = authHeader.substring(7);
                 if (jwtUtil.validateToken(token)) {
                     String email = jwtUtil.getEmailFromToken(token);
-                    // Get user ID from email (you might need to add this to AuthService)
-                    // For now, we'll use email as userId
-                    watchlistService.updateWatchlistStatus(stocks, email);
+                    // Get user ID from email
+                    authService.getUserByEmail(email).ifPresent(user -> {
+                        watchlistService.updateWatchlistStatus(stocks, user.getId());
+                    });
                 }
             } catch (Exception e) {
                 // Continue without updating watchlist status

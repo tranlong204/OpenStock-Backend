@@ -2,6 +2,7 @@ package com.opendevsociety.openstock.controller;
 
 import com.opendevsociety.openstock.dto.AddToWatchlistRequest;
 import com.opendevsociety.openstock.dto.WatchlistItemDto;
+import com.opendevsociety.openstock.service.AuthService;
 import com.opendevsociety.openstock.service.WatchlistService;
 import com.opendevsociety.openstock.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ public class WatchlistController {
     
     @Autowired
     private WatchlistService watchlistService;
+    
+    @Autowired
+    private AuthService authService;
     
     @Autowired
     private JwtUtil jwtUtil;
@@ -62,6 +66,9 @@ public class WatchlistController {
     
     private String getUserIdFromToken(String authHeader) {
         String token = authHeader.substring(7);
-        return jwtUtil.getEmailFromToken(token);
+        String email = jwtUtil.getEmailFromToken(token);
+        return authService.getUserByEmail(email)
+                .map(user -> user.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

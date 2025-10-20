@@ -44,7 +44,10 @@ public class WatchlistService {
     }
     
     public List<String> getUserWatchlistSymbols(String userId) {
-        return watchlistRepository.findSymbolsByUserId(userId);
+        List<WatchlistItem> items = watchlistRepository.findByUserId(userId);
+        return items.stream()
+                .map(WatchlistItem::getSymbol)
+                .collect(Collectors.toList());
     }
     
     public void updateWatchlistStatus(List<StockDto> stocks, String userId) {

@@ -2,6 +2,7 @@ package com.opendevsociety.openstock.repository;
 
 import com.opendevsociety.openstock.entity.WatchlistItem;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,5 +19,6 @@ public interface WatchlistRepository extends MongoRepository<WatchlistItem, Stri
     
     void deleteByUserIdAndSymbol(String userId, String symbol);
     
+    @Query(value = "{'userId': ?0}", fields = "{'symbol': 1}")
     List<String> findSymbolsByUserId(String userId);
 }
