@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/watchlist")
@@ -45,13 +47,16 @@ public class WatchlistController {
     }
     
     @DeleteMapping("/{symbol}")
-    public ResponseEntity<String> removeFromWatchlist(
+    public ResponseEntity<Map<String, String>> removeFromWatchlist(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String symbol) {
         
         String userId = getUserIdFromToken(authHeader);
         watchlistService.removeFromWatchlist(userId, symbol);
-        return ResponseEntity.ok("Removed from watchlist");
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Removed from watchlist");
+        return ResponseEntity.ok(response);
     }
     
     @GetMapping("/check/{symbol}")
